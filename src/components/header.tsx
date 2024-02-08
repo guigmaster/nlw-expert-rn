@@ -16,7 +16,7 @@ export function Header({ title, cartQuantityItems = 0 }: HeaderProps) {
       </View>
 
       {cartQuantityItems > 0 && (
-        <TouchableOpacity className="relative">
+        <TouchableOpacity activeOpacity={0.7} className="relative">
           <View className="bg-lime-300 w-4 h-4 rounded-full items-center justify-center top-2 z-10 -right-3.5">
             <Text className="text-slate-900 font-bold text-xs">{cartQuantityItems}</Text>
           </View>
