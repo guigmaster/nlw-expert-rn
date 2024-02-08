@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { FlatList, SectionList, Text, View } from "react-native";
 
+import { Link } from "expo-router";
+
 import { CATEGORIES, MENU, ProductProps } from "@/utils/data/products";
 
 import { Header } from "@/components/header";
@@ -58,7 +60,9 @@ export default function Home() {
           <Text className="text-xl text-white font-heading mt-8 mb-3">{title}</Text>
         )}
         renderItem={({ item }) => (
-          <Product data={item} />
+          <Link href={`/product/${item.id}`} asChild>
+            <Product data={item} />
+          </Link>
         )}
         className="flex-1 p-5"
         contentContainerStyle={{ paddingBottom: 100 }}
