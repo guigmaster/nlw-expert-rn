@@ -1,10 +1,12 @@
 import { Image, Text, View } from "react-native";
-import { Redirect, useLocalSearchParams } from "expo-router";
+import { Redirect, useLocalSearchParams, useNavigation } from "expo-router";
 
 import { Feather } from "@expo/vector-icons";
 
 import { PRODUCTS } from "@/utils/data/products";
 import { formatCurrency } from "@/utils/functions/formart-currency";
+
+import { useCartStore } from "@/stores/cart-store";
 
 import { Button } from "@/components/button";
 import { LinkButton } from "@/components/link-button";
@@ -12,11 +14,19 @@ import { LinkButton } from "@/components/link-button";
 
 export default function Product() {
   const { id } = useLocalSearchParams();
+  const navigation = useNavigation();
+
+  const cartStore = useCartStore();
 
   const product = PRODUCTS.find((product) => product.id === id);
 
   if (!product) {
     return <Redirect href="/" />
+  }
+
+  function handleAddToCart() {
+    cartStore.add(product!)
+    navigation.goBack();
   }
 
   return (
@@ -43,7 +53,7 @@ export default function Product() {
       </View>
 
       <View className="p-4 pb-8 gap-5">
-        <Button>
+        <Button onPress={handleAddToCart}>
           <Button.Icon>
             <Feather name="plus-circle" size={20} />
           </Button.Icon>
