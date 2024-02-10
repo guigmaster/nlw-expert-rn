@@ -1,18 +1,27 @@
-import { Alert, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Linking, ScrollView, Text, View } from "react-native";
+
+import { useNavigation } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { ProductCartProps, useCartStore } from "@/stores/cart-store";
 import { formatCurrency } from "@/utils/functions/formart-currency";
 
+import { Input } from "@/components/input";
+import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { Product } from "@/components/product";
-import { Input } from "@/components/input";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Button } from "@/components/button";
-import { Feather } from "@expo/vector-icons";
 import { LinkButton } from "@/components/link-button";
+
+const PHONE_NUMBER = "5522981023581";
 
 export default function Cart() {
   const cartStore = useCartStore();
+  const [address, setAddress] = useState("");
+
+  const navigation = useNavigation();
 
   const total = cartStore.products.reduce((total, product) => {
     return total + product.price * product.quantity
@@ -23,6 +32,31 @@ export default function Cart() {
       { text: "Cancelar" },
       { text: "Remover", onPress: () => cartStore.remove(product.id) },
     ])
+  }
+
+  function handleOrder() {
+    if (address.trim().length === 0) {
+      return Alert.alert("Pedido", "Informe os dados da entrega.")
+    }
+
+    const products = cartStore.products
+    .map((product) => `\n ${product.quantity} ${product.title}`)
+    .join("");
+
+    const message = `
+    🍔 NOVO PEDIDO
+    \n Entregar em: ${address}
+
+    ${products}
+
+    \n Valor Total: ${formatCurrency(total)}
+    `
+
+    Linking.openURL(`https://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${message}`);
+    
+    setAddress("");
+    cartStore.clear();
+    navigation.goBack();
   }
 
   return (
@@ -51,13 +85,20 @@ export default function Cart() {
               </Text>
             </View>
 
-            <Input placeholder="Informe o endereço de entrega com rua, bairro, CEP, número e complemento... " />
+            <Input
+              placeholder="Informe o endereço de entrega com rua, bairro, CEP, número e complemento... "
+              value={address}
+              onChangeText={setAddress}
+              blurOnSubmit={true}
+              returnKeyType="next"
+              onSubmitEditing={handleOrder}
+            />
           </View>
         </ScrollView>
       </KeyboardAwareScrollView>
 
       <View className="p-5 gap-5">
-        <Button>
+        <Button onPress={handleOrder}>
           <Button.Text>Enviar Pedido</Button.Text>
           <Button.Icon>
             <Feather name="arrow-right-circle" size={20} />
