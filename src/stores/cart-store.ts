@@ -33,7 +33,7 @@ export const useCartStore = create(
     clear: () => set((state) => ({ products: [] })),
   }),
   {
-    name: "",
+    name: "nlw-expert:cart",
     storage: createJSONStorage(() => AsyncStorage)
   })  
 );
